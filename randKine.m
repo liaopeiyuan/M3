@@ -6,7 +6,7 @@ function [feature,object]=randKine(DOF,type,r,dist)
             feature.A=[0 1 1 0 0 0];
             feature.alpha=[ pi/2 0 -pi/2 pi/2 -pi/2 0];
         else
-            throw(error('spherical wrist is only supported for 6-DOF manipulators'));
+            error('spherical wrist is only supported for 6-DOF manipulators');
         end
         
     elseif lower(strtrim(type))=="generic"
@@ -15,11 +15,11 @@ function [feature,object]=randKine(DOF,type,r,dist)
             feature.A=ones(1,DOF);
             feature.alpha=ones(1,DOF);
         else
-            throw(error('only 2 and 6+ DOF manipulators are supported for the generic option'));
+            error('only 2 and 6+ DOF manipulators are supported for the generic option');
         end
         
     else
-        throw(error('cannot parse manipulator type argument'));
+        error('cannot parse manipulator type argument');
     end
     
     if lower(strtrim(dist))=="uniform"
@@ -61,7 +61,7 @@ function [feature,object]=randKine(DOF,type,r,dist)
         end
         
     else
-        throw(error('cannot parse distribution argument'));        
+        error('cannot parse distribution argument');        
     end
     
     for i=1:DOF

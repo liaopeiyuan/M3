@@ -1,0 +1,9 @@
+function [features,labels]=NNsample(size,dir,format,variant,parallel)
+    if parallel
+        parfor i=1:size
+        end
+    else
+        for i=1:size
+        end
+    end
+end
