@@ -10,9 +10,7 @@ function [feature,label]=randSample(opt,randMani)
                     output=threshold(m,pose,'ikine',opt.ikine);
                     if not(isnan(output))
                         label=vec;
-                        if opt.mani=='kine'
-                            feature=horzcat(featureSt.D,featureSt.A,featureSt.alpha);
-                        end
+                        feature=horzcat(featureSt.D,featureSt.A,featureSt.alpha);
                         if opt.mani=='dyna'
                             feature=horzcat(feature,featureSt.mass,...
                                             reshape(featureSt.R,1,[]),...

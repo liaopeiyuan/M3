@@ -23,6 +23,7 @@ function [features,labels]=NNsample(num,parallel,varargin)
     end
     
     [initF,initL]=randSample(opt,randMani);
+    disp(initF)
     [~,fSize]=size(initF);
     [~,lSize]=size(initL);
     features=zeros(num,fSize);
@@ -31,11 +32,11 @@ function [features,labels]=NNsample(num,parallel,varargin)
         
     if parallel
         parfor i=1:num
-            [featues(i,:),labels(i,:)]=randSample(opt,randMani);
+            [features(i,:),labels(i,:)]=randSample(opt,randMani);
         end
     else
         for i=1:num
-            [featues(i,:),labels(i,:)]=randSample(opt,randMani);
+            [features(i,:),labels(i,:)]=randSample(opt,randMani);
         end
     end
     
