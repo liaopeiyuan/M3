@@ -1,4 +1,4 @@
-function [mat,pose] = randPose(r,dist)
+function [vec,mat,pose] = randPose(r,dist)
        
     if lower(strtrim(dist))=="uniform"
         p=r*rand(1,3)-r/2;
@@ -12,4 +12,5 @@ function [mat,pose] = randPose(r,dist)
     
     mat=transl(p)*trotx(o(1))*troty(o(2))*trotz(o(3));
     pose=SE3(mat);
+    vec=horzcat(p,o);
 end
