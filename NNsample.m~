@@ -1,17 +1,17 @@
-function [features,labels]=NNsample(size,varargin)
+function [features,labels]=NNsample(num,parallel,varargin)
     opt.format='csv';
     opt.variant='CGAN';
-    opt.parallel=true;
     opt.mani='kine';
     opt.DOF=6;
     opt.type='spherical';
     opt.r=0.5;
     opt.dist='uniform';
-    opt.poseR=2;
+    opt.poseR=0.8;
     opt.ikine='analytic';
-    opt.plim=10;
-    opt.testRatio=0.1;
-    
+    opt.plim=50;
+    opt.testRatio=0.01;
+    opt.cutoff=0.03;
+       
     opt = tb_optparse(opt, varargin);
     
     switch opt.mani
@@ -23,23 +23,79 @@ function [features,labels]=NNsample(size,varargin)
             error('cannot parse manipulator argument')
     end
     
-    [initF,initL]=randomSample(opt);
+    [initF,initL]=randSample(opt,randMani);
+    disp(initF)
     [~,fSize]=size(initF);
     [~,lSize]=size(initL);
-    features=zeros(size,fSize);
-    labels=zeros(size,lSize);
+    features=zeros(num,fSize);
+    labels=zeros(num,lSize);
     clear initF initL fSize lSize
-        
-    if opt.parallel
-        parfor i=1:size
-            [featues(i,:),labels(i,:)]=randomSample(opt);
+    
+    switch opt.variant
+        case 'CGAN'
+            labelStr={'x','y','z','wx','wy','wz'};
+            switch opt.mani
+                case 'dyna'
+                    switch opt.DOF
+                        case 6
+                            featStr={'d1','d2','d3','d4','d5','d6',...
+                                     'a1','a2','a3','a4','a5','a6',...
+                                     'alpha1','alpha2','alpha3','alpha4','alpha5','alpha6',...
+                                     'mass1','mass2','mass3','mass4','mass5','mass6',...
+                                     'r11','r12','r13','r21','r22','r23','r31','r32','r33',...
+                                     'r41','r42','r43','r51','r52','r53','r61','r62','r63',...
+                                     'l11','l12','l13','l21','l22','l23','l31','l32','l33',...
+                                     'l41','l42','l43','l51','l52','l53','l61','l62','l63',...
+                                     'b1','b2','b3','b4','b5','b6',...
+                                     'tc11','tc12','tc21','tc22','tc31','tc32',...
+                                     'tc41','tc42','tc51','tc52','tc61','tc62',...
+                                     'g1','g2','g3','g4','g5','g6',...
+                                     'jm1','jm2','jm3','jm4','jm5','jm6'                            
+                            };    
+                        otherwise
+                            
+                    end
+                case 'kine'
+                    switch opt.DOF
+                        case 6
+                            featStr={'d1','d2','d3','d4','d5','d6',...
+                                     'a1','a2','a3','a4','a5','a6',...
+                                     'alpha1','alpha2','alpha3','alpha4','alpha5','alpha6'};    
+                        otherwise
+                            featStr=[];
+                            for i=1:opt.DOF
+                                featStr=horzcat(featStr,strcat('d',num2str(i)));
+                            end
+                            
+                    end
+            end
+            
+            csvwrite('featureTrain.csv',featStr)
+            csvwrite('labelTrain.csv',labelStr)
+            
+            csvwrite('featureTest.csv',featStr)
+            csvwrite('labelTest.csv',labelStr)
+    end
+    
+    
+    if parallel
+        parfor i=1:num
+            [features(i,:),labels(i,:)]=randSample(opt,randMani);
+            if mod(i,200)==0
+               disp(strcat('sample number ',num2str(i),' created')) 
+               
+            end
         end
     else
-        for i=1:size
-            [featues(i,:),labels(i,:)]=randomSample(opt);
+        for i=1:num
+            [features(i,:),labels(i,:)]=randSample(opt,randMani);
+            if mod(i,200)==0
+               disp(strcat('sample number ',num2str(i),' created')) 
+            end
         end
     end
     
+    %{
     function [feature,label]=randomSample(opt)
         [featureSt,m]=randMani(opt.DOF,opt.type,opt.r,opt.dist);
         switch opt.variant
@@ -67,15 +123,33 @@ function [features,labels]=NNsample(size,varargin)
                 error('cannot parse variant argument')
         end
     end
-        
+    %}
+    
+    
+
     switch opt.format
         case 'csv'
-            csvwrite('featureTrain.csv',features(1:int32((1-opt.testRatio)*size),:))
-            csvwrite('featureTrain.csv',features(1:int32((1-opt.testRatio)*size),:))
+            csvwrite('featureTrain.csv',features(1:int32((1-opt.testRatio)*num),:),'-append')
+            csvwrite('labelTrain.csv',labels(1:int32((1-opt.testRatio)*num),:),'-append')
             
+            csvwrite('featureTest.csv',features(int32((1-opt.testRatio)*num):max(size(features)),:),'-append')
+            csvwrite('labelTest.csv',labels(int32((1-opt.testRatio)*num):max(size(features)),:),'-append')
+            
+
         otherwise
                 error('cannot parse format argument')
     end
+    
+    switch opt.format
+        case 'csv'
+            movefile featureTrain.csv data
+            movefile labelTrain.csv data
+            movefile featureTest.csv data
+            movefile labelTest.csv data
+            
+        otherwise
+            error('cannot parse format argument')
+    end  
         
 end
 
