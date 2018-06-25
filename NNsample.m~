@@ -34,6 +34,31 @@ function [features,labels]=NNsample(num,parallel,varargin)
     switch opt.variant
         case 'CGAN'
             labelStr={'x','y','z','wx','wy','wz'};
+        case 'jacobian'
+            switch opt.DOF
+                case 6
+                    labelStr={'j11','j12','j13','j14','j15','j16'...
+                              'j21','j22','j23','j24','j25','j26'...
+                              'j11','j12','j13','j14','j35','j36'...
+                              'j11','j12','j13','j14','j45','j46'...
+                              'j11','j12','j13','j14','j55','j56'...
+                              'j11','j12','j13','j14','j65','j66'...
+                              
+                    };
+                otherwise
+                    labelStr={};
+                    for j=1:6
+                       for i=1:opt.DOF
+                            labelStr=horzcat(labelStr,strcat('j',num2str(i),num2str(j)));
+                       end
+                    end
+            end
+        case 'ikine'
+            labelStr={'ikExists'};
+    end
+
+    switch opt.variant
+        case {'CGAN','jacobian','ikine'}
             switch opt.mani
                 case 'dyna'
                     switch opt.DOF
@@ -53,6 +78,43 @@ function [features,labels]=NNsample(num,parallel,varargin)
                                      'jm1','jm2','jm3','jm4','jm5','jm6'                            
                             };    
                         otherwise
+                            featStr={};
+                            for i=1:opt.DOF
+                                featStr=horzcat(featStr,strcat('d',num2str(i)));
+                            end
+                            for i=1:opt.DOF
+                                featStr=horzcat(featStr,strcat('a',num2str(i)));
+                            end
+                            for i=1:opt.DOF
+                                featStr=horzcat(featStr,strcat('alpha',num2str(i)));
+                            end
+                            for i=1:opt.DOF
+                                featStr=horzcat(featStr,strcat('mass',num2str(i)));
+                            end
+                            for i=1:opt.DOF
+                                featStr=horzcat(featStr,strcat('r',num2str(i),'1'));
+                                featStr=horzcat(featStr,strcat('r',num2str(i),'2'));
+                                featStr=horzcat(featStr,strcat('r',num2str(i),'3'));
+                            end
+                            for i=1:opt.DOF
+                                featStr=horzcat(featStr,strcat('l',num2str(i),'1'));
+                                featStr=horzcat(featStr,strcat('l',num2str(i),'2'));
+                                featStr=horzcat(featStr,strcat('l',num2str(i),'3'));
+                            end
+                            for i=1:opt.DOF
+                                featStr=horzcat(featStr,strcat('b',num2str(i)));
+                            end
+                            for i=1:opt.DOF
+                                featStr=horzcat(featStr,strcat('tc',num2str(i),'1'));
+                                featStr=horzcat(featStr,strcat('tc',num2str(i),'2'));
+                            end
+                            for i=1:opt.DOF
+                                featStr=horzcat(featStr,strcat('g',num2str(i)));
+                            end
+                            for i=1:opt.DOF
+                                featStr=horzcat(featStr,strcat('jm',num2str(i)));
+                            end
+                            
                             
                     end
                 case 'kine'
@@ -62,17 +124,28 @@ function [features,labels]=NNsample(num,parallel,varargin)
                                      'a1','a2','a3','a4','a5','a6',...
                                      'alpha1','alpha2','alpha3','alpha4','alpha5','alpha6'};    
                         otherwise
-                            featStr=[];
+                            featStr={};
                             for i=1:opt.DOF
                                 featStr=horzcat(featStr,strcat('d',num2str(i)));
+                            end
+                            for i=1:opt.DOF
+                                featStr=horzcat(featStr,strcat('a',num2str(i)));
+                            end
+                            for i=1:opt.DOF
+                                featStr=horzcat(featStr,strcat('alpha',num2str(i)));
                             end
                             
                     end
             end
             
+            switch opt.variant
+                case {'jacobian','ikine'}
+                    featStr=horzcat(featStr,{'x','y','z','wx','wy','wz'});
+            end
+            
             csvwrite('featureTrain.csv',featStr)
             csvwrite('labelTrain.csv',labelStr)
-            
+
             csvwrite('featureTest.csv',featStr)
             csvwrite('labelTest.csv',labelStr)
     end

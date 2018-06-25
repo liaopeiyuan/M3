@@ -34,6 +34,31 @@ function [features,labels]=NNsample(num,parallel,varargin)
     switch opt.variant
         case 'CGAN'
             labelStr={'x','y','z','wx','wy','wz'};
+        case 'jacobian'
+            switch opt.DOF
+                case 6
+                    labelStr={'j11','j12','j13','j14','j15','j16'...
+                              'j21','j22','j23','j24','j25','j26'...
+                              'j31','j32','j33','j34','j35','j36'...
+                              'j41','j42','j43','j44','j45','j46'...
+                              'j51','j52','j53','j54','j55','j56'...
+                              'j61','j62','j63','j64','j65','j66'...
+                              
+                    };
+                otherwise
+                    labelStr={};
+                    for j=1:6
+                       for i=1:opt.DOF
+                            labelStr=horzcat(labelStr,strcat('j',num2str(i),num2str(j)));
+                       end
+                    end
+            end
+        case 'ikine'
+            labelStr={'ikExists'};
+    end
+
+    switch opt.variant
+        case {'CGAN','jacobian','ikine'}
             switch opt.mani
                 case 'dyna'
                     switch opt.DOF
@@ -57,44 +82,35 @@ function [features,labels]=NNsample(num,parallel,varargin)
                             for i=1:opt.DOF
                                 featStr=horzcat(featStr,strcat('d',num2str(i)));
                             end
-                            
                             for i=1:opt.DOF
                                 featStr=horzcat(featStr,strcat('a',num2str(i)));
                             end
-                            
                             for i=1:opt.DOF
                                 featStr=horzcat(featStr,strcat('alpha',num2str(i)));
                             end
-                            
                             for i=1:opt.DOF
                                 featStr=horzcat(featStr,strcat('mass',num2str(i)));
                             end
-                            
                             for i=1:opt.DOF
                                 featStr=horzcat(featStr,strcat('r',num2str(i),'1'));
                                 featStr=horzcat(featStr,strcat('r',num2str(i),'2'));
                                 featStr=horzcat(featStr,strcat('r',num2str(i),'3'));
                             end
-                            
                             for i=1:opt.DOF
                                 featStr=horzcat(featStr,strcat('l',num2str(i),'1'));
                                 featStr=horzcat(featStr,strcat('l',num2str(i),'2'));
                                 featStr=horzcat(featStr,strcat('l',num2str(i),'3'));
                             end
-                            
                             for i=1:opt.DOF
                                 featStr=horzcat(featStr,strcat('b',num2str(i)));
                             end
-                            
                             for i=1:opt.DOF
                                 featStr=horzcat(featStr,strcat('tc',num2str(i),'1'));
                                 featStr=horzcat(featStr,strcat('tc',num2str(i),'2'));
                             end
-                            
                             for i=1:opt.DOF
                                 featStr=horzcat(featStr,strcat('g',num2str(i)));
                             end
-                            
                             for i=1:opt.DOF
                                 featStr=horzcat(featStr,strcat('jm',num2str(i)));
                             end
@@ -122,9 +138,14 @@ function [features,labels]=NNsample(num,parallel,varargin)
                     end
             end
             
+            switch opt.variant
+                case {'jacobian','ikine'}
+                    featStr=horzcat(featStr,{'x','y','z','wx','wy','wz'});
+            end
+            
             csvwrite('featureTrain.csv',featStr)
             csvwrite('labelTrain.csv',labelStr)
-            
+
             csvwrite('featureTest.csv',featStr)
             csvwrite('labelTest.csv',labelStr)
     end
