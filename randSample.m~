@@ -21,41 +21,15 @@ function [feature,label]=randSample(opt,randMani)
                         end
                         break;
                     end  
-                    end
-                    
-                case 'jacobian'
-                    
-                    for k=1:opt.plim
-                        [vec,~,pose]=randPose(opt.poseR,opt.dist);
-                        output=threshold(m,pose,'ikine',opt.ikine);
-                        if not(isnan(output))
-                            label=reshape(m.jacobe(output),1,[]);
-                            feature=horzcat(featureSt.D,featureSt.A,featureSt.alpha);
-                            if opt.mani=='dyna'
-                                feature=horzcat(feature,featureSt.mass,...
-                                                reshape(featureSt.R,1,[]),...
-                                                reshape(featureSt.l,1,[]),...
-                                                featureSt.B,...
-                                                reshape(featureSt.Tc,1,[]),...
-                                                featureSt.G,featureSt.Jm);
-                            end
-                            feature=horzcat(feature,vec);
-
-                        end
-                    end
-                    
-                case 'ikine'
+                    end 
+                case 'Jacobian'
                     
                     
                     [vec,~,pose]=randPose(opt.poseR,opt.dist);
                     output=threshold(m,pose,'ikine',opt.ikine);
                     if not(isnan(output))
-                        label=1;                      
-                    else
-                        label=0;
-                    end
-                    
-                    feature=horzcat(featureSt.D,featureSt.A,featureSt.alpha);
+                        label=m.jacobe(output);
+                        feature=horzcat(featureSt.D,featureSt.A,featureSt.alpha);
                         if opt.mani=='dyna'
                             feature=horzcat(feature,featureSt.mass,...
                                             reshape(featureSt.R,1,[]),...
@@ -64,10 +38,14 @@ function [feature,label]=randSample(opt,randMani)
                                             reshape(featureSt.Tc,1,[]),...
                                             featureSt.G,featureSt.Jm);
                         end
-                    feature=horzcat(feature,vec);
+                        feature=horzcat(feature,vec);
+                    else
+                    end  
+                     
+                        
+                     
+                     
                     
-                
-                                 
                 otherwise
                     error('cannot parse variant argument')
             end
