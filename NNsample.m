@@ -76,7 +76,11 @@ function [features,labels]=NNsample(num,parallel,varargin)
         end
     end
     %}
-        
+    switch opt.variant
+        case 'CGAN'
+            features=vertcat(features,[]);
+            labels=vertcat(labels,[]);
+    end
     switch opt.format
         case 'csv'
             csvwrite('featureTrain.csv',features(1:int32((1-opt.testRatio)*num),:))
