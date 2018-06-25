@@ -1,0 +1,1 @@
+[features,labels]=NNsample(2e4,true,'mani','dyna');

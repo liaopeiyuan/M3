@@ -6,10 +6,11 @@ function [features,labels]=NNsample(num,parallel,varargin)
     opt.type='spherical';
     opt.r=0.5;
     opt.dist='uniform';
-    opt.poseR=2;
+    opt.poseR=0.8;
     opt.ikine='analytic';
-    opt.plim=10;
-    opt.testRatio=0.1;
+    opt.plim=50;
+    opt.testRatio=0.01;
+    opt.cutoff=0.03;
     
     opt = tb_optparse(opt, varargin);
     
@@ -33,10 +34,16 @@ function [features,labels]=NNsample(num,parallel,varargin)
     if parallel
         parfor i=1:num
             [features(i,:),labels(i,:)]=randSample(opt,randMani);
+            if mod(i,200)==0
+               disp(strcat(num2str(i),' samples generated')) 
+            end
         end
     else
         for i=1:num
             [features(i,:),labels(i,:)]=randSample(opt,randMani);
+            if mod(i,200)==0
+               disp(strcat(num2str(i),' samples generated')) 
+            end
         end
     end
     

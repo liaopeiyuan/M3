@@ -1,8 +1,8 @@
 function output = threshold(m,pose,varargin)
-    opt.maniplty='yoshikawa';
+    opt.maniplty='asada';
     opt.verbose=false;
-    opt.ikine='numerical';
-    opt.cutoff=0.3;
+    opt.ikine='analytic';
+    opt.cutoff=0.03;
     
     opt = tb_optparse(opt, varargin);
     
@@ -29,6 +29,13 @@ function output = threshold(m,pose,varargin)
 
         if all(not(isnan(q)))
             output=mani(m,q,opt.maniplty);
+            if output<=opt.cutoff
+                %figure 1
+                %scatter(ct,output)
+                %hold on
+                %disp(output)
+                output=NaN;
+            end
         else
             output=NaN;
         end
