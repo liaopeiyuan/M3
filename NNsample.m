@@ -113,9 +113,7 @@ function [features,labels]=NNsample(num,parallel,varargin)
                             end
                             for i=1:opt.DOF
                                 featStr=horzcat(featStr,strcat('jm',num2str(i)));
-                            end
-                            
-                            
+                            end                                                       
                     end
                 case 'kine'
                     switch opt.DOF
@@ -149,8 +147,7 @@ function [features,labels]=NNsample(num,parallel,varargin)
             csvwrite('featureTest.csv',featStr)
             csvwrite('labelTest.csv',labelStr)
     end
-    
-    
+        
     if parallel
         parfor i=1:num
             [features(i,:),labels(i,:)]=randSample(opt,randMani);
@@ -198,17 +195,12 @@ function [features,labels]=NNsample(num,parallel,varargin)
     end
     %}
     
-    
-
     switch opt.format
         case 'csv'
             csvwrite('featureTrain.csv',features(1:int32((1-opt.testRatio)*num),:),'-append')
-            csvwrite('labelTrain.csv',labels(1:int32((1-opt.testRatio)*num),:),'-append')
-            
-            csvwrite('featureTest.csv',features(int32((1-opt.testRatio)*num):max(size(features)),:),'-append')
-            csvwrite('labelTest.csv',labels(int32((1-opt.testRatio)*num):max(size(features)),:),'-append')
-            
-
+            csvwrite('labelTrain.csv',labels(1:int32((1-opt.testRatio)*num),:),'-append')           
+            csvwrite('featureTest.csv',features(int32((1-opt.testRatio)*num)+1:max(size(features)),:),'-append')
+            csvwrite('labelTest.csv',labels(int32((1-opt.testRatio)*num)+1:max(size(features)),:),'-append')           
         otherwise
                 error('cannot parse format argument')
     end
@@ -218,8 +210,7 @@ function [features,labels]=NNsample(num,parallel,varargin)
             movefile featureTrain.csv data
             movefile labelTrain.csv data
             movefile featureTest.csv data
-            movefile labelTest.csv data
-            
+            movefile labelTest.csv data           
         otherwise
             error('cannot parse format argument')
     end  
