@@ -1,1 +1,0 @@
-function [features,labels]=GANsample(size,dir,)

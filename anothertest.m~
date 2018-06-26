@@ -1,9 +1,0 @@
-a=1
-
-switch a
-    case {1,2,3}
-        disp('yay')
-    case {2}
-    otherwise
-        disp('nay')
-end
