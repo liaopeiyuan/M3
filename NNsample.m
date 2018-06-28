@@ -24,7 +24,7 @@ function [features,labels]=NNsample(num,parallel,varargin)
     end
     
     [initF,initL]=randSample(opt,randMani);
-    disp(initF)
+    %disp(initF)
     [~,fSize]=size(initF);
     [~,lSize]=size(initL);
     features=zeros(num,fSize);
@@ -141,11 +141,11 @@ function [features,labels]=NNsample(num,parallel,varargin)
                     featStr=horzcat(featStr,{'x','y','z','wx','wy','wz'});
             end
             
-            csvwrite('featureTrain.csv',featStr)
-            csvwrite('labelTrain.csv',labelStr)
+            cell2csv('featureTrain.csv',featStr,',')
+            cell2csv('labelTrain.csv',labelStr,',')
 
-            csvwrite('featureTest.csv',featStr)
-            csvwrite('labelTest.csv',labelStr)
+            cell2csv('featureTest.csv',featStr,',')
+            cell2csv('labelTest.csv',labelStr,',')
     end
         
     if parallel
@@ -197,10 +197,10 @@ function [features,labels]=NNsample(num,parallel,varargin)
     
     switch opt.format
         case 'csv'
-            csvwrite('featureTrain.csv',features(1:int32((1-opt.testRatio)*num),:),'-append')
-            csvwrite('labelTrain.csv',labels(1:int32((1-opt.testRatio)*num),:),'-append')           
-            csvwrite('featureTest.csv',features(int32((1-opt.testRatio)*num)+1:max(size(features)),:),'-append')
-            csvwrite('labelTest.csv',labels(int32((1-opt.testRatio)*num)+1:max(size(features)),:),'-append')           
+            dlmwrite('featureTrain.csv',features(1:int32((1-opt.testRatio)*num),:),'-append','delimiter',',','roffset',1)
+            dlmwrite('labelTrain.csv',labels(1:int32((1-opt.testRatio)*num),:),'-append','delimiter',',','roffset',1)           
+            dlmwrite('featureTest.csv',features(int32((1-opt.testRatio)*num)+1:max(size(features)),:),'-append','delimiter',',','roffset',1)
+            dlmwrite('labelTest.csv',labels(int32((1-opt.testRatio)*num)+1:max(size(features)),:),'-append','delimiter',',','roffset',1)           
         otherwise
                 error('cannot parse format argument')
     end
@@ -216,6 +216,3 @@ function [features,labels]=NNsample(num,parallel,varargin)
     end  
         
 end
-
-    
-

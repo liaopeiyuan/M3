@@ -26,7 +26,6 @@ function output = threshold(m,pose,varargin)
     
     try
         q=inverse(m,pose);
-
         if all(not(isnan(q)))
             output=mani(m,q,opt.maniplty);
             if output<=opt.cutoff

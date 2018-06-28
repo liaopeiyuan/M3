@@ -46,13 +46,33 @@ function [feature,label]=randSample(opt,randMani)
                     
                 case 'ikine'
                     
-                    
-                    [vec,~,pose]=randPose(opt.poseR,opt.dist);
-                    output=threshold(m,pose,'ikine',opt.ikine);
-                    if not(isnan(output))
-                        label=1;                      
-                    else
-                        label=0;
+                    label=0;
+                    x=0.3;
+                    while x>0.25
+                        [vec,~,pose]=randPose(opt.poseR,opt.dist);
+                        
+                        switch lower(strtrim(opt.ikine))
+                            case 'numerical'
+                                inverse=@ikine;
+                            case 'analytic'
+                                inverse=@ikine6s; 
+                            otherwise
+                                error('cannot parse inverse kinematics argument');
+                        end
+                        
+                        try
+                            output=inverse(m,pose);
+                        catch
+                            output=NaN;
+                        end
+                        
+                        if not(isnan(output))
+                            label=1;
+                            break;
+                        else
+                            label=0;
+                            x=rand();
+                        end
                     end
                     
                     feature=horzcat(featureSt.D,featureSt.A,featureSt.alpha);
